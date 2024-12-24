@@ -10,7 +10,7 @@ app.get('/', (c) => {
 	return c.text('Hello Hono!');
 });
 
-const games = ['snake_game'];
+const games = ['snake_game', 'space_invaders', 'chess', '2048'];
 
 app.post('/assets', async (c) => {
 	const data = await c.req.json();
@@ -30,7 +30,7 @@ app.post('/assets', async (c) => {
 
 		// Set the base directory for the glob pattern
 		archive.glob('**/*', {
-			cwd: gameName, // Set the base directory to the game folder
+			cwd: 'games/' + gameName, // Set the base directory to the game folder
 			ignore: ['main.py'], // Exclude the main.py file
 			dot: true, // Include hidden files if needed
 		});
@@ -60,7 +60,7 @@ app.post('/code', async (c) => {
 	const data = await c.req.json();
 	const gameName = data.gameName;
 	if (games.includes(gameName)) {
-		const fileData = fs.readFileSync(gameName + '/main.py');
+		const fileData = fs.readFileSync('games/' + gameName + '/main.py');
 		return new Response(fileData, {
 			headers: {
 				'Content-Type': 'text/plain',
