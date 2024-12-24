@@ -60,7 +60,7 @@ function App() {
 					<button
 						className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 disabled:bg-gray-400"
 						onClick={runPython}
-						disabled={isLoading}
+						disabled={isLoading || isGameRunning}
 					>
 						Run Game
 					</button>
