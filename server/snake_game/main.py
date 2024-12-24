@@ -96,8 +96,27 @@ class Game:
         self.score = 0
 
     def draw(self):
-        self.food.draw()
-        self.snake.draw()
+        if self.state == "RUNNING":
+            self.food.draw()
+            self.snake.draw()
+        elif self.state == "STOPPED":
+            game_over_text = title_font.render("Game Over", True, DARK_GREEN)
+            refresh_text = score_font.render("Refresh to play again", True, DARK_GREEN)
+
+            screen.blit(
+                game_over_text,
+                (
+                    (width - game_over_text.get_width()) // 2,
+                    (height - game_over_text.get_height()) // 2 - 20,
+                ),
+            )
+            screen.blit(
+                refresh_text,
+                (
+                    (width - refresh_text.get_width()) // 2,
+                    (height - refresh_text.get_height()) // 2 + 20,
+                ),
+            )
 
     def update(self):
         if self.state == "RUNNING":
@@ -120,13 +139,13 @@ class Game:
             self.game_over()
 
     def game_over(self):
-        self.snake.reset()
-        self.food.position = self.food.generate_random_pos(self.snake.body)
         self.state = "STOPPED"
         pyodide.globals.get("setIsGameEnded")(True)
-        self.score = 0
 
     def check_collision_with_tail(self):
+        headless_body = self.snake.body[1:]
+        if self.snake.body[0] in headless_body:
+            self.game_over()
         headless_body = self.snake.body[1:]
         if self.snake.body[0] in headless_body:
             self.game_over()
@@ -151,10 +170,7 @@ async def main():
 
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if game.state == "STOPPED":
-                    game.state = "RUNNING"
-                    pyodide.globals.get("setIsGameEnded")(False)
+            if event.type == pygame.KEYDOWN and game.state == "RUNNING":
                 if event.key == pygame.K_UP and game.snake.direction != Vector2(0, 1):
                     game.snake.direction = Vector2(0, -1)
                 if event.key == pygame.K_DOWN and game.snake.direction != Vector2(
@@ -193,5 +209,3 @@ async def main():
 
 
 main()
-# if __name__ == "__main__":
-#     asyncio.run(main())
